@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Loja Camda</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #006400;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .brand img {
+      height: 50px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      border-radius: 6px;
+    }
+    .user-actions button {
+      background: white;
+      color: #006400;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 10px;
+      font-weight: bold;
+    }
+    .user-actions button:hover {
+      background: #ddd;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h2 { margin-top: 30px; }
+
+    h2.corte { color: #b22222; }
+    h2.leite { color: #1e90ff; }
+    h2.equinos { color: #8b4513; }
+
+    .produtos {
+      background: url('inicio.png') no-repeat center center;
+      background-size: cover;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .card strong { font-size: 18px; color: #333; }
+    .muted { color: #666; font-size: 14px; }
+    .preco { font-size: 16px; font-weight: bold; color: #b22222; margin: 8px 0; }
+    .btn {
+      background: #006400;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn:hover { background: #228B22; }
+
+    #carrinho {
+      margin-top: 30px;
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #carrinho h2 { margin-top: 0; }
+    #carrinho ul { list-style: none; padding: 0; }
+    #carrinho li { margin: 5px 0; }
+
+    footer {
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .pagamentos {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .pagamentos img {
+      height: 50px;
+      margin: 10px;
+      filter: drop-shadow(0 0 3px rgba(0,0,0,0.3));
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="logo.png" alt="Logo Camda">
+      <img src="aniversario.png" alt="60 anos Camda">
+      <h1 style="color:#006400; margin-left:15px;">Loja Camda</h1>
+    </div>
+    <div class="user-actions">
+      <button>Login</button>
+      <button>Cadastrar</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="produtos">
+      <!-- Rações de Corte -->
+      <h2 class="corte">Rações de Corte</h2>
+      <div class="grid">
+        <div class="card corte"><strong>Ração Minercamda Corte 18</strong><p class="muted">Indicado para bovinos em fase de crescimento e engorda.</p><p class="preco">R$ 120,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Corte 18',120)">Adicionar ao carrinho</button></div>
+        <div class="card corte"><strong>Ração Minercamda Confinamento</strong><p class="muted">Indicado para bovinos em confinamento.</p><p class="preco">R$ 135,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Confinamento',135)">Adicionar ao carrinho</button></div>
+        <div class="card corte"><strong>Ração Minercamda Engorda T</strong><p class="muted">Indicado para bovinos em fase de engorda.</p><p class="preco">R$ 140,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Engorda T',140)">Adicionar ao carrinho</button></div>
+        <div class="card corte"><strong>Ração Minercamda Recria EDP</strong><p class="muted">Indicado para bovinos em recria.</p><p class="preco">R$ 125,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Recria EDP',125)">Adicionar ao carrinho</button></div>
+      </div>
+
+      <!-- Rações de Leite -->
+      <h2 class="leite">Rações de Leite</h2>
+      <div class="grid">
+        <div class="card leite"><strong>Ração Minercamda Leite 18 VS</strong><p class="muted">Indicado para vacas em lactação.</p><p class="preco">R$ 110,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Leite 18 VS',110)">Adicionar ao carrinho</button></div>
+        <div class="card leite"><strong>Ração Minercamda Leite 20</strong><p class="muted">Alta produção de leite.</p><p class="preco">R$ 130,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Leite 20',130)">Adicionar ao carrinho</button></div>
+        <div class="card leite"><strong>Ração Minercamda Leite 22</strong><p class="muted">Produção intensiva.</p><p class="preco">R$ 145,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Leite 22',145)">Adicionar ao carrinho</button></div>
+        <div class="card leite"><strong>Ração Minercamda Leite 24 VL</strong><p class="muted">Indicado para vacas de alta performance.</p><p class="preco">R$ 160,00</p><button class="btn" onclick="addCarrinho('Ração Minercamda Leite 24 VL',160)">Adicionar ao carrinho</button></div>
+      </div>
+
+      <!-- Equinos e Ovinos -->
+      <h2 class="equinos">Equinos e Ovinos</h2>
+      <div class="grid">
+        <div class="card equinos"><strong>Minercamda Equino Tropa</strong><p class="muted">Indicado para equinos em crescimento e manutenção.</p><p class="preco">R$ 100,00</p><button class="btn" onclick="addCarrinho('Minercamda Equino Tropa',100)">Adicionar ao carrinho</button></div>
+        <div class="card equinos"><strong>Minercamda Ovinos</strong><p class="muted">Indicado para ovinos, com inclusão de fontes proteicas.</p><p class="preco">R$ 95,00</p><button class="btn" onclick="addCarrinho('Minercamda Ovinos',95)">Adicionar ao carrinho</button></div>
+      </div>
+    </section>
+        <!-- Carrinho -->
+    <section id="carrinho">
+      <h2>Carrinho de Compras</h2>
+      <ul id="lista-carrinho"></ul>
+      <p><strong>Total:</strong> R$ <span id="total">0,00</span></p>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="year"></span> Loja Camda — Feito com HTML, CSS e JS.
+    <div class="pagamentos">
+      <p>Formas de pagamento aceitas:</p>
+      <img src="logocartao.png" alt="Cartões aceitos">
+      <img src="segurancacartao.png" alt="Compra Segura">
+      <img src="pix.png" alt="Pagamento via Pix">
+    </div>
+  </footer>
+
+  <script>
+    // Atualiza o ano automaticamente no rodapé
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Array para armazenar os itens do carrinho
+    let carrinho = [];
+
+    // Função para adicionar item ao carrinho
+    function addCarrinho(nome, preco) {
+      carrinho.push({nome, preco});
+      renderCarrinho();
+    }
+
+    // Função para renderizar o carrinho na tela
+    function renderCarrinho() {
+      const lista = document.getElementById("lista-carrinho");
+      lista.innerHTML = "";
+      let total = 0;
+      carrinho.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.nome} - R$ ${item.preco.toFixed(2)}`;
+        lista.appendChild(li);
+        total += item.preco;
+      });
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+  </script>
+</body>
+</html>
+
