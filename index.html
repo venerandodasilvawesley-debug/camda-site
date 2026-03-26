@@ -2,6 +2,13 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Loja Camda</title>
   <style>
     body {
@@ -165,6 +172,9 @@
       <h2>Carrinho de Compras</h2>
       <ul id="lista-carrinho"></ul>
       <p><strong>Total:</strong> R$ <span id="total">0,00</span></p>
+      <div style="margin-top: 15px;">
+        <button class="btn" onclick="limparCarrinho()" style="background: #ff9800;">Limpar Carrinho</button>
+      </div>
     </section>
   </main>
 
@@ -179,31 +189,162 @@
   </footer>
 
   <script>
+    // ===== VALIDAÇÃO E SANITIZAÇÃO =====
+    const MAX_ITEM_NAME_LENGTH = 200;
+    const MAX_CART_ITEMS = 50;
+    const MIN_PRICE = 0.01;
+    const MAX_PRICE = 999999.99;
+
+    // Sanitiza strings removendo caracteres perigosos
+    function sanitizeString(str) {
+      if (typeof str !== 'string') return '';
+      return str
+        .trim()
+        .replace(/[<>]/g, '') // Remove < e >
+        .substring(0, MAX_ITEM_NAME_LENGTH); // Limita comprimento
+    }
+
+    // Valida se um preço é válido
+    function validatePrice(price) {
+      const num = parseFloat(price);
+      return !isNaN(num) && num >= MIN_PRICE && num <= MAX_PRICE;
+    }
+
+    // Valida e retorna o preço formatado
+    function sanitizePrice(price) {
+      const num = parseFloat(price);
+      if (!validatePrice(num)) {
+        throw new Error('Preço inválido. Deve estar entre R$ 0,01 e R$ 999.999,99');
+      }
+      return parseFloat(num.toFixed(2));
+    }
+
     // Atualiza o ano automaticamente no rodapé
     document.getElementById("year").textContent = new Date().getFullYear();
 
     // Array para armazenar os itens do carrinho
     let carrinho = [];
 
-    // Função para adicionar item ao carrinho
+    // Função para adicionar item ao carrinho com validação completa
     function addCarrinho(nome, preco) {
-      carrinho.push({nome, preco});
-      renderCarrinho();
+      try {
+        // Validação de nome
+        const nomeSanitizado = sanitizeString(nome);
+        if (!nomeSanitizado) {
+          showError('Nome do produto inválido');
+          return false;
+        }
+
+        // Validação de preço
+        const precoValidado = sanitizePrice(preco);
+
+        // Verifica limite de itens no carrinho
+        if (carrinho.length >= MAX_CART_ITEMS) {
+          showError(`Limite de ${MAX_CART_ITEMS} itens no carrinho atingido`);
+          return false;
+        }
+
+        // Adiciona item ao carrinho
+        carrinho.push({
+          nome: nomeSanitizado,
+          preco: precoValidado,
+          id: Date.now() // ID único para possível deleção futura
+        });
+
+        renderCarrinho();
+        showSuccess(`"${nomeSanitizado}" adicionado ao carrinho`);
+        return true;
+      } catch (error) {
+        showError(error.message || 'Erro ao adicionar ao carrinho');
+        return false;
+      }
     }
 
-    // Função para renderizar o carrinho na tela
+    // Remove item do carrinho por ID
+    function removeCarrinho(itemId) {
+      carrinho = carrinho.filter(item => item.id !== itemId);
+      renderCarrinho();
+      showSuccess('Item removido do carrinho');
+    }
+
+    // Limpa o carrinho
+    function limparCarrinho() {
+      if (carrinho.length === 0) {
+        showError('Carrinho já está vazio');
+        return;
+      }
+      carrinho = [];
+      renderCarrinho();
+      showSuccess('Carrinho limpo');
+    }
+
+    // Função para renderizar o carrinho na tela com segurança
     function renderCarrinho() {
       const lista = document.getElementById("lista-carrinho");
-      lista.innerHTML = "";
+      lista.innerHTML = ''; // Limpa lista anterior
+
+      if (carrinho.length === 0) {
+        lista.innerHTML = '<li style="color: #999;">Carrinho vazio</li>';
+        document.getElementById("total").textContent = '0,00';
+        return;
+      }
+
       let total = 0;
-      carrinho.forEach(item => {
+      carrinho.forEach((item, index) => {
         const li = document.createElement("li");
-        li.textContent = `${item.nome} - R$ ${item.preco.toFixed(2)}`;
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.padding = '8px';
+        li.style.borderBottom = '1px solid #eee';
+
+        // Cria o texto do item - SEGURO com textContent
+        const itemText = document.createElement("span");
+        itemText.textContent = `${item.nome} - R$ ${item.preco.toFixed(2)}`;
+
+        // Cria botão de remover
+        const btnRemover = document.createElement("button");
+        btnRemover.textContent = 'Remover';
+        btnRemover.style.background = '#d32f2f';
+        btnRemover.style.color = 'white';
+        btnRemover.style.border = 'none';
+        btnRemover.style.padding = '5px 10px';
+        btnRemover.style.borderRadius = '4px';
+        btnRemover.style.cursor = 'pointer';
+        btnRemover.style.fontSize = '12px';
+        btnRemover.onclick = function(e) {
+          e.preventDefault();
+          removeCarrinho(item.id);
+        };
+
+        li.appendChild(itemText);
+        li.appendChild(btnRemover);
         lista.appendChild(li);
+
         total += item.preco;
       });
+
+      // Atualiza total com formatação segura
       document.getElementById("total").textContent = total.toFixed(2);
     }
+
+    // Função para mostrar erros ao usuário
+    function showError(message) {
+      console.error('❌', message);
+      alert('⚠️ ' + message);
+    }
+
+    // Função para mostrar sucesso ao usuário
+    function showSuccess(message) {
+      console.log('✓', message);
+      // Você pode expandir isso para um toast notification melhor no futuro
+    }
+
+    // Event listener para validar que os handlers onclick sejam seguros
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('✓ Página carregada com segurança validada');
+      renderCarrinho(); // Renderiza carrinho vazio inicialmente
+    });
   </script>
 </body>
 </html>
