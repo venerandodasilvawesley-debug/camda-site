@@ -235,6 +235,12 @@
           return false;
         }
 
+        // Validação de tipo de preço (Fix: Type Coercion)
+        if (typeof preco !== 'number') {
+          showError('Preço deve ser um número válido');
+          return false;
+        }
+
         // Validação de preço
         const precoValidado = sanitizePrice(preco);
 
@@ -278,6 +284,17 @@
       showSuccess('Carrinho limpo');
     }
 
+    // Calcula total do carrinho dinamicamente (Fix: DOM Manipulation)
+    function calculateTotal() {
+      return carrinho.reduce((sum, item) => sum + item.preco, 0);
+    }
+
+    // Atualiza display de total (protege contra DOM manipulation)
+    function updateTotalDisplay() {
+      const total = calculateTotal();
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
     // Função para renderizar o carrinho na tela com segurança
     function renderCarrinho() {
       const lista = document.getElementById("lista-carrinho");
@@ -285,12 +302,11 @@
 
       if (carrinho.length === 0) {
         lista.innerHTML = '<li style="color: #999;">Carrinho vazio</li>';
-        document.getElementById("total").textContent = '0,00';
+        updateTotalDisplay();
         return;
       }
 
-      let total = 0;
-      carrinho.forEach((item, index) => {
+      carrinho.forEach((item) => {
         const li = document.createElement("li");
         li.style.display = 'flex';
         li.style.justifyContent = 'space-between';
@@ -320,12 +336,10 @@
         li.appendChild(itemText);
         li.appendChild(btnRemover);
         lista.appendChild(li);
-
-        total += item.preco;
       });
 
-      // Atualiza total com formatação segura
-      document.getElementById("total").textContent = total.toFixed(2);
+      // Atualiza total de forma segura
+      updateTotalDisplay();
     }
 
     // Função para mostrar erros ao usuário
